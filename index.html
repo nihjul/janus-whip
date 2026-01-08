@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Janus WHIP Subscriber</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #status {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 4px;
+      background: #f8f9fa;
+    }
+    .error {
+      color: #dc3545;
+    }
+    .success {
+      color: #28a745;
+    }
+    .info {
+      color: #17a2b8;
+    }
+    #video-container {
+      margin-top: 1rem;
+      display: none;
+    }
+    #remote-video {
+      width: 100%;
+      max-width: 640px;
+      background: #000;
+      border-radius: 4px;
+    }
+    #connection-state {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      font-size: 0.875rem;
+      background: #e9ecef;
+      border-radius: 4px;
+    }
+    .state-new { color: #6c757d; }
+    .state-connecting { color: #fd7e14; }
+    .state-connected { color: #28a745; }
+    .state-disconnected { color: #dc3545; }
+    .state-failed { color: #dc3545; }
+    .state-closed { color: #6c757d; }
+  </style>
+</head>
+<body>
+  <h1>Janus WHIP Subscriber</h1>
+  
+  <div class="form-group">
+    <label for="janus-url">Janus Server URL (hostname or IP)</label>
+    <input type="text" id="janus-url" placeholder="e.g., 192.168.1.100 or localhost">
+  </div>
+  
+  <button id="subscribe-btn">Subscribe</button>
+  
+  <div id="status"></div>
+  
+  <div id="video-container">
+    <video id="remote-video" autoplay playsinline muted></video>
+    <div id="connection-state"></div>
+  </div>
+
+  <script type="module">
+    import { JanusGateway } from './subscriber.js';
+
+    const urlInput = document.getElementById('janus-url');
+    const subscribeBtn = document.getElementById('subscribe-btn');
+    const statusDiv = document.getElementById('status');
+    const videoContainer = document.getElementById('video-container');
+    const remoteVideo = document.getElementById('remote-video');
+    const connectionStateDiv = document.getElementById('connection-state');
+
+    const gateway = new JanusGateway();
+    let currentPeerConnection = null;
+
+    function setStatus(message, type = 'info') {
+      statusDiv.textContent = message;
+      statusDiv.className = type;
+    }
+
+    function updateConnectionState(state) {
+      connectionStateDiv.textContent = `Connection: ${state}`;
+      connectionStateDiv.className = `state-${state}`;
+    }
+
+    subscribeBtn.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        setStatus('Please enter a Janus server URL', 'error');
+        return;
+      }
+
+      // Clean up previous connection if any
+      if (currentPeerConnection) {
+        currentPeerConnection.close();
+        currentPeerConnection = null;
+      }
+
+      subscribeBtn.disabled = true;
+      videoContainer.style.display = 'none';
+      remoteVideo.srcObject = null;
+      setStatus('Connecting to Janus...', 'info');
+
+      try {
+        gateway.setUrl(url);
+        
+        setStatus('Creating session...', 'info');
+        
+        // Show video container early
+        videoContainer.style.display = 'block';
+        
+        // Define ontrack handler BEFORE subscribing
+        // This ensures we catch tracks as soon as they arrive
+        const ontrack = (event) => {
+          console.log('Received track:', event.track.kind);
+          setStatus(`Received ${event.track.kind} track`, 'info');
+          
+          if (event.streams && event.streams[0]) {
+            remoteVideo.srcObject = event.streams[0];
+            console.log('Attached stream to video element');
+          }
+        };
+        
+        // Use the subscribe method which handles everything
+        // Pass ontrack callback so it's set up before SDP exchange
+        const { sessionId, handlerId, peerConnection, offer } = await gateway.subscribe({
+          ontrack: ontrack,
+        });
+        
+        currentPeerConnection = peerConnection;
+        
+        updateConnectionState(peerConnection.connectionState);
+        
+        // Update connection state display
+        peerConnection.onconnectionstatechange = () => {
+          const state = peerConnection.connectionState;
+          console.log('Connection state changed:', state);
+          updateConnectionState(state);
+          
+          switch (state) {
+            case 'connected':
+              setStatus('Stream connected!', 'success');
+              break;
+            case 'disconnected':
+              setStatus('Stream disconnected', 'error');
+              break;
+            case 'failed':
+              setStatus('Connection failed', 'error');
+              break;
+            case 'closed':
+              setStatus('Connection closed', 'info');
+              break;
+          }
+        };
+        
+        // Log ICE connection state for debugging
+        peerConnection.oniceconnectionstatechange = () => {
+          console.log('ICE connection state:', peerConnection.iceConnectionState);
+        };
+        
+        // Log ICE gathering state for debugging
+        peerConnection.onicegatheringstatechange = () => {
+          console.log('ICE gathering state:', peerConnection.iceGatheringState);
+        };
+        
+        setStatus('Setting up WebRTC connection...', 'info');
+        
+        console.log('Session ID:', sessionId);
+        console.log('Handler ID:', handlerId);
+        console.log('Offer SDP:', offer.sdp);
+        
+      } catch (error) {
+        setStatus(`Error: ${error.message}`, 'error');
+        console.error(error);
+        videoContainer.style.display = 'none';
+      } finally {
+        subscribeBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
