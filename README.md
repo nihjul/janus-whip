@@ -13,3 +13,6 @@ Just is used to run the different commands to build and run programs, to learn t
 just
 ```
 This will give a list of commands and what they do
+> [!WARNING]
+> I have only used docker on mac using colima, not on linux yet(TBD)
+> A more complete way to use docker is coming
