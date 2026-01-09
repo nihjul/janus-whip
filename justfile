@@ -2,7 +2,7 @@ alias b := build
 
 # build WHIP frontend for janus
 build-whip:
-	go build -o whip cmd/whip/main.go
+	go build -o out/whip cmd/whip/main.go
 
 # builds OCI image using container
 container:
@@ -11,6 +11,9 @@ container:
 # builds all
 build: build-whip
 
+# website to play feed from janus
+player PORT:
+	python3 -m http.server {{PORT}} --directory ./website
 # runs elixir script to subscribe
 script-subscribe URL:
 	JANUS_URL={{URL}} elixir ./scripts/subscriber.exs
