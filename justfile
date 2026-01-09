@@ -22,15 +22,15 @@ build: build-whip
 
 # run using container
 run-container:
-	container run --name janus-server janus:latest
+	container run janus:latest
 
 # run using docker
 run-docker:
-	docker run -p 8088:8088 -p 20000-20020:20000-20020/udp --name janus-server janus:latest
+	docker run -p 8088:8088 -p 20000-20020:20000-20020/udp janus:latest
 
 # run WHIP frontend
-run:
-	./whip
+run URL:
+	JANUS_URL={{URL}} ./whip
 
 # builds and runs janus server using container
 container: build-container run-container
