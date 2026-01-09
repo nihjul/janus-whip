@@ -1,7 +1,6 @@
 alias b := build
 
 default:
-	echo If using apple Tahoe I recommend installing apple container\(https://github.com/apple/container\)
 	just --list
 
 # build WHIP frontend for janus
@@ -28,6 +27,10 @@ run-container:
 # run using docker
 run-docker:
 	docker run -p 8088:8088 -p 20000-20020:20000-20020/udp --name janus-server janus:latest
+
+# run WHIP frontend
+run:
+	./whip
 
 # builds and runs janus server using container
 container: build-container run-container
