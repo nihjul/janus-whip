@@ -36,8 +36,8 @@ RUN make configs
 WORKDIR /opt/janus/etc/janus
 RUN rm -f janus.plugin.videoroom.jcfg
 RUN rm -f janus.jcfg
-COPY ./janus.plugin.videoroom.jcfg .
-COPY ./janus.jcfg .
+COPY ./configs/janus/janus.plugin.videoroom.jcfg .
+COPY ./configs/janus/janus.jcfg .
 
 WORKDIR /opt/janus/bin
 CMD ["/opt/janus/bin/janus"]
