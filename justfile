@@ -1,19 +1,39 @@
 alias b := build
 
+default:
+	echo If using apple Tahoe I recommend installing apple container\(https://github.com/apple/container\)
+	just --list
+
 # build WHIP frontend for janus
 build-whip:
+	echo Building...
 	go build -o out/whip cmd/whip/main.go
+	echo Build complete
 
 # builds OCI image using container
-container:
+build-container:
 	container build -t janus:latest .
 
 # builds OCI image using docker
-docker:
+build-docker:
 	docker build -t janus:latest .
 
 # builds all
 build: build-whip
+
+# run using container
+run-container:
+	container run --name janus-server janus:latest
+
+# run using docker
+run-docker:
+	docker run -p 8088:8088 -p 20000-20020:20000-20020/udp --name janus-server janus:latest
+
+# builds and runs janus server using container
+container: build-container run-container
+
+# builds and runs janus server using docker
+docker: build-docker run-docker
 
 # website to play feed from janus
 player PORT:
