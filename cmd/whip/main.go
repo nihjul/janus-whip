@@ -5,11 +5,17 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/nihjul/janus-whip/pkg/janus"
 )
 
 func main() {
+	janusUrl := os.Getenv("JANUS_URL")
+	if len(janusUrl) == 0 {
+		slog.Error("no janus url was provided, provided one using JANUS_URL")
+		return
+	}
 	mime := "application/sdp"
 	router := http.NewServeMux()
 	// TODO: check response for error
@@ -33,7 +39,7 @@ func main() {
 				w.Write([]byte{})
 			}
 			slog.Info("request info", "roomId", roomId, "Content-Type", contentType, "Body", string(body))
-			janusInfo := janus.NewJanus("http://192.168.64.2:8088/janus/")
+			janusInfo := janus.NewJanus("http://"+janusUrl+":8088/janus/")
 			if err := janusInfo.NewSession(); err != nil {
 				slog.Error("error creating new session", "ERROR", err.Error())
 			}
