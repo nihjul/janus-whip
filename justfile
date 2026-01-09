@@ -7,7 +7,7 @@ default:
 # build WHIP frontend for janus
 build-whip:
 	echo Building...
-	go build -o out/whip cmd/whip/main.go
+	go build -o whip cmd/whip/main.go
 	echo Build complete
 
 # builds OCI image using container
