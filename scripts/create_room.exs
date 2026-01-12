@@ -29,6 +29,23 @@ defmodule JanusGateway do
       transaction: generateTransaction("", 11),
     }
   end
+  def createRoomBody do
+    %{
+      janus: "message",
+      transaction: generateTransaction("", 11),
+      body: %{
+        request: "create",
+        room: 1212,
+        permanent: false,
+        secret: "tv2",
+        is_private: true,
+        publishers: 1,
+        audiocodec: "opus",
+        videocodec: "h264",
+        bitrate: 0
+      }
+    }
+  end
   def parseResponse(:ok, response) do
     case Map.get(response.body, "janus") do
       "error" -> parseResponse(:error, response)
@@ -53,8 +70,15 @@ defmodule JanusGateway do
     handlerId = parseResponse(status, rawResponse)["data"]["id"]
     Integer.to_string(handlerId)
   end
+  def createRoom(baseUrl, sessionId, handlerId) do
+    url = baseUrl <> sessionId <> "/" <> handlerId
+    {status, rawResponse} = Req.post(url, json: createRoomBody())
+    parseResponse(status, rawResponse)
+  end
 end
 
 url = JanusGateway.setUrl(System.get_env("JANUS_URL"))
 sessionId = JanusGateway.session(url)
 handlerId = JanusGateway.handler(url, sessionId)
+response = JanusGateway.createRoom(url, sessionId, handlerId)
+IO.puts(response["plugindata"]["data"]["room"])
