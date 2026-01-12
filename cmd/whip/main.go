@@ -21,7 +21,6 @@ func main() {
 	// TODO: check response for error
 	// TODO: make error response conforment to RFC https://www.rfc-editor.org/rfc/rfc9726
 	// TODO: Add DELETE request to handle stream disconenct
-	// TODO: Get janus url from environment
 
 	router.HandleFunc("POST /{room}/whip", func(w http.ResponseWriter, r *http.Request) {
 		roomId := r.PathValue("room")
