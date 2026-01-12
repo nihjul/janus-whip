@@ -48,3 +48,7 @@ script-subscribe URL:
 # runs elixir script to publish
 script-publish URL:
 	JANUS_URL={{URL}} elixir ./scripts/publisher.exs
+
+# runs elixir script to create room
+script-createroom URL:
+	JANUS_URL={{URL}} elixir ./scripts/create_room.exs
