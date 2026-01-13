@@ -3,8 +3,8 @@ FROM golang:1.25.5-alpine
 WORKDIR /usr/janus-whip
 
 COPY go.mod .
-COPY ./cmd .
-COPY ./pkg .
+COPY ./cmd ./cmd
+COPY ./pkg ./pkg
 
 RUN go build -v -o /usr/local/bin/whip ./cmd/whip/main.go
 
