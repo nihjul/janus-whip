@@ -11,11 +11,13 @@ build-whip:
 
 # builds OCI image using container
 build-container:
-	container build -t janus:latest .
+	container build -t janus:latest -f ./build/Dockerfile.janus
+	container build -t whip:latest -f ./build/Dockerfile.whip
 
 # builds OCI image using docker
 build-docker:
-	docker build -t janus:latest .
+	docker build -t janus:latest -f ./build/Dockerfile.janus
+	docker build -t whip:latest -f ./build/Dockerfile.whip
 
 # builds all
 build: build-whip
