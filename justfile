@@ -30,7 +30,7 @@ run-container:
 run-docker:
 	docker run -p 8088:8088 -p 20000-20020:20000-20020/udp janus:latest
 
-# run WHIP frontend
+# run WHIP frontend with env var set to provided url
 run URL:
 	JANUS_URL={{URL}} ./whip
 
@@ -43,6 +43,7 @@ docker: build-docker run-docker
 # website to play feed from janus
 player PORT:
 	python3 -m http.server {{PORT}} -d ./website
+
 # runs elixir script to subscribe
 script-subscribe URL:
 	JANUS_URL={{URL}} elixir ./scripts/subscriber.exs
