@@ -11,7 +11,7 @@ func (info *JanusInfo) JoinAndConfigure(sdp string) error {
 	videoRoomBody := &VideoRoomBody{
 		Request:    "joinandconfigure",
 		Ptype:      "publisher",
-		Room:       1234,
+		Room:       1212,
 		Record:     false,
 		Audiocodec: "opus",
 		Videocodec: "h264",
