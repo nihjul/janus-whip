@@ -22,7 +22,7 @@ func (info *JanusInfo) NewHandler() error {
 
 	bodyReader := bytes.NewReader(body)
 
-	resp, err := http.Post(info.BaseURL+info.SessionId, "application/json", bodyReader)
+	resp, err := http.Post(info.ApiUrl+info.SessionId, "application/json", bodyReader)
 	if err != nil {
 		return err
 	}

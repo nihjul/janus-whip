@@ -21,7 +21,7 @@ func (info *JanusInfo) NewSession() error {
 
 	bodyReader := bytes.NewReader(body)
 
-	resp, err := http.Post(info.BaseURL, "application/json", bodyReader)
+	resp, err := http.Post(info.ApiUrl, "application/json", bodyReader)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (info *JanusInfo) NewSession() error {
 }
 
 func (info *JanusInfo) SessionInfo() (string, error) {
-	resp, err := http.Get(info.BaseURL + info.SessionId)
+	resp, err := http.Get(info.ApiUrl + info.SessionId)
 	if err != nil {
 		return "", err
 	}

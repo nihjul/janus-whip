@@ -39,7 +39,8 @@ type parseJSEP struct {
 }
 
 type JanusInfo struct {
-	BaseURL   string
+	ApiUrl    string
 	SessionId string
 	HandlerId string
+	RTPUrl    string
 }

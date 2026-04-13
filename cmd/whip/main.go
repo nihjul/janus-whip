@@ -6,13 +6,15 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/nihjul/janus-whip/pkg/janus"
 )
 
 func main() {
-	janusUrl := os.Getenv("JANUS_URL")
-	if len(janusUrl) == 0 {
+	janusApiUrl := os.Getenv("JANUS_API_URL")
+	janusRtpUrl := os.Getenv("JANUS_RTP_URL")
+	if len(janusApiUrl) == 0 {
 		slog.Error("no janus url was provided, provided one using JANUS_URL")
 		return
 	}
@@ -38,7 +40,7 @@ func main() {
 				w.Write([]byte{})
 			}
 			slog.Info("request info", "roomId", roomId, "Content-Type", contentType, "Body", string(body))
-			janusInfo := janus.NewJanus("http://" + janusUrl + ":8088/janus/")
+			janusInfo := janus.NewJanus(janusApiUrl, janusRtpUrl)
 			if err := janusInfo.NewSession(); err != nil {
 				slog.Error("error creating new session", "ERROR", err.Error())
 			}
@@ -47,7 +49,13 @@ func main() {
 				slog.Error("error creating new handler", "ERROR", err.Error())
 			}
 
-			if err := janusInfo.JoinAndConfigure(string(body)); err != nil {
+			joinRoomId, err := strconv.Atoi(roomId)
+			if err != nil {
+				slog.Error("error converting room id", "ERROR", err.Error())
+				return
+			}
+
+			if err := janusInfo.JoinAndConfigure(joinRoomId, string(body)); err != nil {
 				slog.Error("error join and configure", "ERROR", err.Error())
 			}
 
@@ -57,7 +65,7 @@ func main() {
 			}
 			slog.Info("JanusInfo", "SessionId", janusInfo.SessionId, "HandleId", janusInfo.HandlerId, "SDP", sdpAnswer)
 
-			w.Header().Add("Location", janusInfo.BaseURL+janusInfo.SessionId+"/"+janusInfo.HandlerId)
+			w.Header().Add("Location", janusInfo.RTPUrl+janusInfo.SessionId+"/"+janusInfo.HandlerId)
 			w.Header().Add("Content-Type", mime)
 			w.WriteHeader(http.StatusCreated)
 			w.Write([]byte(sdpAnswer))
