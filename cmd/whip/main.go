@@ -38,7 +38,7 @@ func main() {
 				w.Write([]byte{})
 			}
 			slog.Info("request info", "roomId", roomId, "Content-Type", contentType, "Body", string(body))
-			janusInfo := janus.NewJanus("http://"+janusUrl+":8088/janus/")
+			janusInfo := janus.NewJanus("http://" + janusUrl + ":8088/janus/")
 			if err := janusInfo.NewSession(); err != nil {
 				slog.Error("error creating new session", "ERROR", err.Error())
 			}
