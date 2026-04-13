@@ -55,3 +55,7 @@ script-publish URL:
 # runs elixir script to create room
 script-createroom URL:
 	JANUS_URL={{URL}} elixir ./scripts/create_room.exs
+
+# runs bash script to create room
+script-createroom-sh URL:
+	JANUS_URL={{URL}} bash ./scripts/create_room.sh
