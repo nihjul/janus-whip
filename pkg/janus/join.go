@@ -7,11 +7,11 @@ import (
 	"net/http"
 )
 
-func (info *JanusInfo) JoinAndConfigure(sdp string) error {
+func (info *JanusInfo) JoinAndConfigure(roomId int, sdp string) error {
 	videoRoomBody := &VideoRoomBody{
 		Request:    "joinandconfigure",
 		Ptype:      "publisher",
-		Room:       1212,
+		Room:       roomId,
 		Record:     false,
 		Audiocodec: "opus",
 		Videocodec: "h264",
@@ -34,7 +34,7 @@ func (info *JanusInfo) JoinAndConfigure(sdp string) error {
 
 	bodyReader := bytes.NewReader(body)
 
-	resp, err := http.Post(info.BaseURL+info.SessionId+"/"+info.HandlerId, "application/json", bodyReader)
+	resp, err := http.Post(info.ApiUrl+info.SessionId+"/"+info.HandlerId, "application/json", bodyReader)
 	if err != nil {
 		return err
 	}

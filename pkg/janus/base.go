@@ -1,7 +1,10 @@
 package janus
 
-func NewJanus(baseURL string) *JanusInfo {
+func NewJanus(apiUrl string, rtpUrl string) *JanusInfo {
+	apiUrl = "http://" + apiUrl + ":8088/janus/"
+	rtpUrl = "http://" + rtpUrl + ":8088/janus/"
 	return &JanusInfo{
-		BaseURL: baseURL,
+		ApiUrl: apiUrl,
+		RTPUrl: rtpUrl,
 	}
 }
