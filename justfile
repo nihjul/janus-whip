@@ -31,8 +31,8 @@ run-docker:
 	docker run -p 8088:8088 -p 20000-20020:20000-20020/udp janus:latest
 
 # run WHIP frontend with env var set to provided url
-run URL:
-	JANUS_URL={{URL}} ./whip
+run API RTP:
+	JANUS_API_URL={{API}} JANUS_RTP_URL={{RTP}} ./whip
 
 # builds and runs janus server using container
 container: build-container run-container

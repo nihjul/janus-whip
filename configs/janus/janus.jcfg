@@ -65,7 +65,7 @@ general: {
 	#interface = "1.2.3.4"			# Interface to use (will be used in SDP)
 	#server_name = "MyJanusInstance"# Public name of this Janus instance
 									# as it will appear in an info request
-	#session_timeout = 60			# How long (in seconds) we should wait before
+	session_timeout = 3600			# How long (in seconds) we should wait before
 									# deciding a Janus session has timed out. A
 									# session times out when no request is received
 									# for session_timeout seconds (default=60s).
@@ -333,7 +333,7 @@ nat: {
 	# Multiple public IP addresses can be specified as a comma separated list
 	# if the Janus is deployed in a DMZ between two 1-1 NAT for internal and
 	# external users.
-	nat_1_1_mapping = "192.168.64.4"
+	nat_1_1_mapping = "192.168.64.5"
 	keep_private_host = false
 
 	# You can configure a TURN server in two different ways: specifying a

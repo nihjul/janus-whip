@@ -49,7 +49,7 @@ class JanusGateway {
       transaction: this.generateTransaction(),
       body: {
         request: "listparticipants",
-        room: 1234,
+        room: 1212,
       },
     };
   }
@@ -61,7 +61,7 @@ class JanusGateway {
       body: {
         request: "join",
         ptype: "subscriber",
-        room: 1234,
+        room: 1212,
         streams: [
           {
             feed: publisher,
