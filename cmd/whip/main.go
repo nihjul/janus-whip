@@ -24,7 +24,7 @@ func main() {
 	// TODO: make error response conforment to RFC https://www.rfc-editor.org/rfc/rfc9726
 	// TODO: Add DELETE request to handle stream disconenct
 
-	router.HandleFunc("POST /{room}/whip", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("POST /{room}/whip/{temp}", func(w http.ResponseWriter, r *http.Request) {
 		roomId := r.PathValue("room")
 		contentType := r.Header["Content-Type"][0]
 		if contentType == mime {
