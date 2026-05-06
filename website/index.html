@@ -90,6 +90,21 @@
     <label for="janus-url">Janus Server URL (hostname or IP)</label>
     <input type="text" id="janus-url" placeholder="e.g., 192.168.1.100 or localhost">
   </div>
+
+  <div class="form-group">
+    <label for="turn-url">TURN URL (optional)</label>
+    <input type="text" id="turn-url" placeholder="e.g., turn:turn.example.com:3478?transport=udp">
+  </div>
+
+  <div class="form-group">
+    <label for="turn-username">TURN Username (optional)</label>
+    <input type="text" id="turn-username" placeholder="e.g., janus-user">
+  </div>
+
+  <div class="form-group">
+    <label for="turn-password">TURN Password (optional)</label>
+    <input type="password" id="turn-password" placeholder="Enter TURN password">
+  </div>
   
   <button id="subscribe-btn">Subscribe</button>
   
@@ -104,6 +119,9 @@
     import { JanusGateway } from './subscriber.js';
 
     const urlInput = document.getElementById('janus-url');
+    const turnUrlInput = document.getElementById('turn-url');
+    const turnUsernameInput = document.getElementById('turn-username');
+    const turnPasswordInput = document.getElementById('turn-password');
     const subscribeBtn = document.getElementById('subscribe-btn');
     const statusDiv = document.getElementById('status');
     const videoContainer = document.getElementById('video-container');
@@ -123,8 +141,33 @@
       connectionStateDiv.className = `state-${state}`;
     }
 
+    function normalizeTurnUrl(turnUrl) {
+      if (!turnUrl) {
+        return turnUrl;
+      }
+
+      let normalized = turnUrl;
+
+      if (/^turns?:/i.test(normalized)) {
+        // Keep as-is when a valid TURN scheme is already present.
+      } else {
+        normalized = `turn:${normalized}`;
+      }
+
+      if (/^turn:/i.test(normalized) && !/transport=/i.test(normalized)) {
+        normalized = normalized.includes('?')
+          ? `${normalized}&transport=udp`
+          : `${normalized}?transport=udp`;
+      }
+
+      return normalized;
+    }
+
     subscribeBtn.addEventListener('click', async () => {
       const url = urlInput.value.trim();
+      const turnUrl = normalizeTurnUrl(turnUrlInput.value.trim());
+      const turnUsername = turnUsernameInput.value.trim();
+      const turnPassword = turnPasswordInput.value.trim();
       
       if (!url) {
         setStatus('Please enter a Janus server URL', 'error');
@@ -164,7 +207,25 @@
         
         // Use the subscribe method which handles everything
         // Pass ontrack callback so it's set up before SDP exchange
+        const iceServers = [
+          { urls: 'stun:stun.l.google.com:19302' },
+        ];
+
+        if (turnUrl) {
+          const turnServer = { urls: turnUrl };
+          if (turnUsername) {
+            turnServer.username = turnUsername;
+          }
+          if (turnPassword) {
+            turnServer.credential = turnPassword;
+          }
+          iceServers.push(turnServer);
+        }
+
         const { sessionId, handlerId, peerConnection, offer } = await gateway.subscribe({
+          config: {
+            iceServers,
+          },
           ontrack: ontrack,
         });
         
