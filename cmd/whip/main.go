@@ -21,7 +21,7 @@ func main() {
 	mime := "application/sdp"
 	router := http.NewServeMux()
 	// TODO: check response for error
-	// TODO: make error response conforment to RFC https://www.rfc-editor.org/rfc/rfc9726
+	// TODO: make error response conforment to RFC https://www.rfc-editor.org/rfc/rfc9725.html
 	// TODO: Add DELETE request to handle stream disconenct
 
 	// TODO: Rename temp, it looks like it might not be rfc compliant
