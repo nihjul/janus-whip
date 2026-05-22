@@ -37,7 +37,7 @@ defmodule JanusGateway do
         request: "create",
         room: 1212,
         permanent: false,
-        secret: "tv2",
+        secret: "testing",
         is_private: true,
         publishers: 1,
         audiocodec: "opus",
