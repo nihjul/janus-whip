@@ -10,3 +10,12 @@ general: {
 	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
 	#string_ids = true
 }
+
+room-1212: {
+    secret = "testing"
+    is_private = true
+    publishers = 1
+    audiocodec = "opus"
+    videocodec = "h264"
+	bitrate = 8000
+}
